@@ -1,0 +1,113 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "AMOR API (Autonomous Multi-AI Orchestration & Routing)",
+    "version": "1.0.0",
+    "description": "Strategy-based routing across local mock and OpenAI models.",
+    "license": {
+      "name": "Copyright (c) Devin B. Royal. All Rights Reserved."
+    }
+  },
+  "servers": [
+    {
+      "url": "http://localhost:4002",
+      "description": "Local AMOR"
+    }
+  ],
+  "paths": {
+    "/health": {
+      "get": {
+        "summary": "Health check",
+        "responses": {
+          "200": {
+            "description": "Service is healthy",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "service": {
+                      "type": "string"
+                    },
+                    "mode": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/ai/route": {
+      "post": {
+        "summary": "Route AI request based on strategy",
+        "security": [
+          {
+            "UpstreamKey": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "prompt": {
+                    "type": "string"
+                  },
+                  "strategy": {
+                    "type": "string",
+                    "enum": [
+                      "cheap",
+                      "balanced",
+                      "accurate"
+                    ]
+                  }
+                },
+                "required": [
+                  "prompt"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "AI routing result",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Missing upstream API key"
+          },
+          "502": {
+            "description": "Model routing failed"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "UpstreamKey": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-forwarded-api-key"
+      }
+    }
+  }
+}
